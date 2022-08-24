@@ -1,5 +1,9 @@
-import React, {ChangeEvent, useState, KeyboardEvent} from "react";
+import React, {ChangeEvent} from "react";
 import {FilterType} from "./App";
+import AddItemForm from "./components/AddItemForm";
+import EditableSpan from "./components/EditableSpan";
+import {Button, Checkbox, IconButton} from "@mui/material";
+import {Delete} from "@mui/icons-material";
 
 type PropsType = {
     id: string
@@ -10,6 +14,8 @@ type PropsType = {
     addTask: (todolistID: string, newTitle: string) => void
     changeTaskStatus: (todolistID: string, taskId: string, status: boolean) => void
     removeTodolist: (todolistId: string) => void
+    ChangeTaskTitle: (TodolistId: string, taskId: string, newTitle: string) => void
+    ChangeTodolistTitle: (TodolistId: string, newTitle: string) => void
     filter: FilterType
 }
 
@@ -29,51 +35,29 @@ export const Todolist: React.FC<PropsType> = (
         addTask,
         changeTaskStatus,
         removeTodolist,
+        ChangeTaskTitle,
+        ChangeTodolistTitle,
         filter
     }
 ) => {
-    const [newTitle, setNewTitle] = useState<string>('')
-    const [error, setError] = useState<boolean>(false)
 
 
     const RemoveTaskHandler = (taskID: string) => {
         removeTask(id, taskID)
     }
     const onAllClickHandler = () => {
-        changeFilter(id,'all')
+        changeFilter(id, 'all')
     }
     const onActiveClickHandler = () => {
-        changeFilter(id,'active')
+        changeFilter(id, 'active')
     }
     const onCompleteClickHandler = () => {
-        changeFilter(id,'completed')
+        changeFilter(id, 'completed')
     }
 
 
-    const addNewTask = () => {
-        const trimmedTitle = newTitle.trim()
-
-        if (trimmedTitle) {
-            addTask(id, newTitle)
-            setNewTitle('')
-            setError(false)
-        } else {
-            setError(true)
-        }
-    }
-    const addTaskHandler = () => {
-        addNewTask()
-    }
-
-
-    const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-        setNewTitle(e.currentTarget.value)
-    }
-    const onKeyDownHandler = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            addNewTask()
-        }
-        setError(false)
+    const addNewTask = (title: string) => {
+        addTask(id, title)
     }
 
 
@@ -82,45 +66,50 @@ export const Todolist: React.FC<PropsType> = (
     }
 
 
-    const inputClassName = error ? "error" : ""
+    const ChangeTask = (taskId: string, newTitle: string) => {
+        ChangeTaskTitle(id, taskId, newTitle)
+    }
 
-    const allClassName = filter === 'all' ? "active-filter" : ""
-    const activeClassName = filter === 'active' ? "active-filter" : ""
-    const completedClassName = filter === 'completed' ? "active-filter" : ""
+    const ChangeTodolist = (newTitle: string) => {
+        ChangeTodolistTitle(id, newTitle)
+    }
+
+    const allClassName = filter === 'all' ? "outlined" : "text"
+    const activeClassName = filter === 'active' ? "outlined" : "text"
+    const completedClassName = filter === 'completed' ? "outlined" : "text"
 
     return (
         <div className="App">
             <div>
-                <h3>{title}
-                <button onClick={onClickTitleHandler}>✖</button>
+
+                <h3>
+                    <EditableSpan value={title} callBack={ChangeTodolist}/>
+                    <IconButton aria-label="delete" size="small" onClick={onClickTitleHandler}>
+                        <Delete/>
+                    </IconButton>
                 </h3>
 
-                <div>
-                    <input onChange={onChangeHandler}
-                           value={newTitle}
-                           onKeyDown={onKeyDownHandler}
-                           className={inputClassName}/>
-                    <button onClick={addTaskHandler}>+</button>
-                    {error && <div className={'error-message'}>Error! Title couldn't be empty!</div>}
-                </div>
-                <ul>
+                <AddItemForm addItem={addNewTask}/>
 
-                    {tasks.map(t => {
-                        const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-                            changeTaskStatus(id, t.id, e.currentTarget.checked)
-                        }
-                        return <li key={t.id} className={t.isDone ? 'is-done' : ''}>
-                            <input type="checkbox" checked={t.isDone} onChange={onChangeHandler}/>
-                            <span>{t.title}</span>
-                            <button onClick={() => RemoveTaskHandler(t.id)}>✖</button>
-                        </li>
-                    })}
+                {tasks.map(t => {
+                    const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+                        changeTaskStatus(id, t.id, e.currentTarget.checked)
+                    }
+                    return <div key={t.id} className={t.isDone ? 'is-done' : ''}>
+                        <Checkbox onChange={onChangeHandler} checked={t.isDone} color='primary'/>
+                        <EditableSpan value={t.title} callBack={(newTitle) => ChangeTask(t.id, newTitle)}/>
+                        <IconButton aria-label="delete" size="small" onClick={() => RemoveTaskHandler(t.id)}>
+                            <Delete/>
+                        </IconButton>
+                    </div>
+                })}
 
-                </ul>
+
                 <div>
-                    <button onClick={onAllClickHandler} className={allClassName}>All</button>
-                    <button onClick={onActiveClickHandler} className={activeClassName}>Active</button>
-                    <button onClick={onCompleteClickHandler} className={completedClassName}>Completed</button>
+                    <Button onClick={onAllClickHandler} variant={allClassName} color='warning'>All</Button>
+                    <Button onClick={onActiveClickHandler} variant={activeClassName} color='error'>Active</Button>
+                    <Button onClick={onCompleteClickHandler} variant={completedClassName}
+                            color='secondary'>Completed</Button>
                 </div>
             </div>
         </div>
