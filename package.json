@@ -17,7 +17,9 @@
     "@types/uuid": "^8.3.4",
     "react": "^18.3.0-next-ca990e9a7-20220804",
     "react-dom": "^18.3.0-next-ca990e9a7-20220804",
+    "react-redux": "^8.0.2",
     "react-scripts": "3.4.1",
+    "redux": "^4.2.0",
     "typescript": "^4.7.4",
     "uuid": "^8.3.2"
   },
