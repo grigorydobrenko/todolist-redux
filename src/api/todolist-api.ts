@@ -21,7 +21,48 @@ export const todolistAPI = {
     },
     deleteTodolist(todolistId: string) {
         return instance.delete<ResponseType>(`todo-lists/${todolistId}`)
+    },
+    getTasks(todolistId: string) {
+        return instance.get<ResponseGetTasksType>(`todo-lists/${todolistId}/tasks`)
+    },
+    createTask(todolistId: string, title: string) {
+        return instance.post<ResponseType<{item: TaskType}>>(`todo-lists/${todolistId}/tasks`, {title: title})
+    },
+    updateTask(todolistId: string, taskId: string, model: ModelType) {
+        return instance.put<ResponseType<{item: TaskType}>>(`todo-lists/${todolistId}/tasks/${taskId}`, model)
+    },
+    deleteTask(todolistId: string, taskId: string) {
+        return instance.delete<ResponseType>(`todo-lists/${todolistId}/tasks/${taskId}`)
     }
+}
+
+type TaskType = {
+    description: string
+    title: string
+    completed: boolean
+    status: number
+    priority: number
+    startDate: string
+    deadline: string
+    id: string
+    todoListId: string
+    order: number
+    addedDate: string
+}
+
+export type ResponseGetTasksType = {
+    items: TaskType[]
+    totalCount: number
+    error: string
+}
+
+export type ModelType = {
+    title: string
+    description: string
+    status: number
+    priority: number
+    startDate: string
+    deadline: string
 }
 
 
@@ -32,34 +73,10 @@ type TodolistType = {
     title: string
 }
 
-
 export type ResponseType<D = {}> = {
     resultCode: number
-    messages: Array<string>
-    fieldsErrors: Array<string>
+    messages: string[]
+    fieldsErrors: string
     data: D
 }
 
-
-type CreateTodolistResponseType = {
-    resultCode: number
-    messages: Array<string>
-    fieldsErrors: Array<string>
-    data: {
-        item: TodolistType
-    }
-}
-
-type UpdateTodolistResponseType = {
-    resultCode: number
-    messages: Array<string>
-    fieldsErrors: Array<string>
-    data: {}
-}
-
-type DeleteTodolistResponseType = {
-    resultCode: number
-    messages: Array<string>
-    fieldsErrors: Array<string>
-    data: {}
-}
