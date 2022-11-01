@@ -1,10 +1,11 @@
-import React, { useCallback} from "react";
-import {FilterType} from "./App";
+import React, {useCallback} from "react";
 import AddItemForm from "./components/AddItemForm";
 import EditableSpan from "./components/EditableSpan";
 import {Button, IconButton} from "@mui/material";
 import {Delete} from "@mui/icons-material";
 import TaskComponent from "./components/TaskComponent";
+import {TaskStatuses, TaskType} from "./api/todolist-api";
+import {FilterType} from "./state/todolists-reducer";
 
 type PropsType = {
     id: string
@@ -13,18 +14,13 @@ type PropsType = {
     removeTask: (todolistId: string, taskID: string) => void
     changeFilter: (todolistID: string, filter: FilterType) => void
     addTask: (todolistID: string, newTitle: string) => void
-    changeTaskStatus: (todolistID: string, taskId: string, status: boolean) => void
+    changeTaskStatus: (todolistID: string, taskId: string, status: TaskStatuses) => void
     removeTodolist: (todolistId: string) => void
     ChangeTaskTitle: (TodolistId: string, taskId: string, newTitle: string) => void
     ChangeTodolistTitle: (TodolistId: string, newTitle: string) => void
     filter: FilterType
 }
 
-export type TaskType = {
-    id: string,
-    title: string,
-    isDone: boolean
-}
 
 export const Todolist: React.FC<PropsType> = React.memo((
     {
@@ -41,7 +37,6 @@ export const Todolist: React.FC<PropsType> = React.memo((
         filter
     }
 ) => {
-    console.log('tl called')
 
 
     const onAllClickHandler = useCallback(() => {
@@ -66,7 +61,6 @@ export const Todolist: React.FC<PropsType> = React.memo((
         removeTodolist(id)
     }
 
-
     const ChangeTodolist = useCallback((newTitle: string) => {
         ChangeTodolistTitle(id, newTitle)
     }, [ChangeTodolistTitle, id])
@@ -75,33 +69,36 @@ export const Todolist: React.FC<PropsType> = React.memo((
     const activeClassName = filter === 'active' ? "outlined" : "text"
     const completedClassName = filter === 'completed' ? "outlined" : "text"
 
+    let tasksForTodolist = tasks
+
+    if (filter === 'active') {
+        tasksForTodolist = tasks.filter(t => t.status === TaskStatuses.New)
+    }
+    if (filter === 'completed') {
+        tasksForTodolist = tasks.filter(t => t.status === TaskStatuses.Completed)
+    }
 
 
 
     return (
         <div className="App">
             <div>
-
                 <h3>
                     <EditableSpan value={title} callBack={ChangeTodolist}/>
                     <IconButton aria-label="delete" size="small" onClick={onClickTitleHandler}>
                         <Delete/>
                     </IconButton>
                 </h3>
-
                 <AddItemForm addItem={addNewTask}/>
-
-                {tasks.map(t =>
+                {tasksForTodolist.map(t =>
                     <TaskComponent
                         key={t.id}
                         changeTaskStatus={changeTaskStatus}
                         removeTask={removeTask}
                         ChangeTaskTitle={ChangeTaskTitle}
-                        t={t}
+                        task={t}
                         todolistId={id}/>
                 )}
-
-
                 <div>
                     <Button onClick={onAllClickHandler} variant={allClassName} color='warning'>All</Button>
                     <Button onClick={onActiveClickHandler} variant={activeClassName} color='error'>Active</Button>
