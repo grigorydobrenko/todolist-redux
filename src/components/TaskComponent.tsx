@@ -18,7 +18,7 @@ const TaskComponent = React.memo((props: TaskPropsType) => {
         props.removeTask(props.todolistId, taskID)
     }, [props.removeTask, props.task.id])
     const onChangeHandler = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        const status = e.currentTarget.checked? TaskStatuses.Completed : TaskStatuses.New
+        const status = e.currentTarget.checked ? TaskStatuses.Completed : TaskStatuses.New
         props.changeTaskStatus(props.todolistId, props.task.id, status)
     }, [props.todolistId, props.task.id])
     const ChangeTask = useCallback((taskId: string, newTitle: string) => {
