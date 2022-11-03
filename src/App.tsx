@@ -6,10 +6,8 @@ import {AppBar, Container, Grid, IconButton, Paper, Toolbar, Typography} from "@
 
 import {MenuOpen} from "@mui/icons-material";
 import {
-    AddTodolistAC,
     ChangeTodolistFilterAC,
-    ChangeTodolistTitleAC, FilterType, getTodoTC,
-    RemoveTodolistAC,
+    changeTodoTitleTC, createTodoTC, deleteTodoTC, FilterType, getTodoTC,
 } from "./state/todolists-reducer";
 import {
     changeTaskTitleAC, createTaskTC,
@@ -19,11 +17,9 @@ import {
 import {TaskStatuses, TaskType} from "./api/todolist-api";
 import {useAppDispatch, useAppSelector} from "./app/hooks";
 
-
 export type TasksStateType = {
     [id: string]: TaskType[]
 }
-
 
 function App() {
 
@@ -45,20 +41,16 @@ function App() {
     }, [dispatch])
 
     const changeTaskStatus = useCallback((todolistID: string, taskId: string, status: TaskStatuses) => {
-        dispatch(updateTaskTC(todolistID, taskId, status))
+        dispatch(updateTaskTC(todolistID, taskId, {status}))
     }, [dispatch])
 
     const removeTodolist = useCallback((todolistId: string) => {
-        let action = RemoveTodolistAC(todolistId)
-        dispatch(action)
-
+        dispatch(deleteTodoTC(todolistId))
     }, [dispatch])
 
 
     const addTodolist = useCallback((todolistTitle: string) => {
-        let action = AddTodolistAC(todolistTitle)
-        dispatch(action)
-
+        dispatch(createTodoTC(todolistTitle))
     }, [dispatch])
 
     const ChangeTaskTitle = useCallback((TodolistId: string, taskId: string, newTitle: string) => {
@@ -67,7 +59,7 @@ function App() {
 
 
     const ChangeTodolistTitle = useCallback((TodolistId: string, newTitle: string) => {
-        dispatch(ChangeTodolistTitleAC(TodolistId, newTitle))
+        dispatch(changeTodoTitleTC(TodolistId, newTitle))
     }, [dispatch])
 
     useEffect(() => {
