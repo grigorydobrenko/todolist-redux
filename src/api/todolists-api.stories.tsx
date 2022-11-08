@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {ModelType, todolistAPI} from '../api/todolist-api';
+import {ModelType, todolistAPI} from './todolist-api'
 
 export default {
     title: 'API'
