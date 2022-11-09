@@ -4,6 +4,7 @@ import {AddBox} from "@mui/icons-material";
 
 type AddItemFormPropsType = {
     addItem: (title: string) => void
+    disabled?: boolean
 }
 
 
@@ -55,8 +56,9 @@ const AddItemForm = memo((props: AddItemFormPropsType) => {
                 label='Title'
                 helperText={error && 'Title is required'}
                 variant="outlined"
+                disabled={props.disabled}
                 size="small"/>
-            <IconButton color="primary" onClick={addItemHandler}>
+            <IconButton color="primary" onClick={addItemHandler} disabled={props.disabled}>
                 <AddBox/>
             </IconButton>
         </div>

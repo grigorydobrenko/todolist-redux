@@ -8,6 +8,7 @@ import {TaskStatuses, TaskType} from "../../../api/todolist-api"
 import {FilterType} from "../todolists-reducer";
 import {fetchTasksTC} from "../tasks-reducer";
 import {useAppDispatch} from "../../../app/hooks";
+import {RequestStatusType} from "../../../app/app-reducer";
 
 type PropsType = {
     id: string
@@ -18,9 +19,10 @@ type PropsType = {
     addTask: (todolistID: string, newTitle: string) => void
     changeTaskStatus: (todolistID: string, taskId: string, status: TaskStatuses) => void
     removeTodolist: (todolistId: string) => void
-    ChangeTaskTitle: (TodolistId: string, taskId: string, newTitle: string) => void
-    ChangeTodolistTitle: (TodolistId: string, newTitle: string) => void
-    filter: FilterType
+    changeTaskTitle: (TodolistId: string, taskId: string, newTitle: string) => void
+    changeTodolistTitle: (TodolistId: string, newTitle: string) => void
+    filter: FilterType,
+    entityStatus: RequestStatusType
 }
 
 
@@ -34,9 +36,10 @@ export const Todolist: React.FC<PropsType> = React.memo((
         addTask,
         changeTaskStatus,
         removeTodolist,
-        ChangeTaskTitle,
-        ChangeTodolistTitle,
-        filter
+        changeTaskTitle,
+        changeTodolistTitle,
+        filter,
+        entityStatus
     }
 ) => {
 
@@ -65,8 +68,8 @@ export const Todolist: React.FC<PropsType> = React.memo((
     }
 
     const ChangeTodolist = useCallback((newTitle: string) => {
-        ChangeTodolistTitle(id, newTitle)
-    }, [ChangeTodolistTitle, id])
+        changeTodolistTitle(id, newTitle)
+    }, [changeTodolistTitle, id])
 
     const allClassName = filter === 'all' ? "outlined" : "text"
     const activeClassName = filter === 'active' ? "outlined" : "text"
@@ -91,17 +94,17 @@ export const Todolist: React.FC<PropsType> = React.memo((
             <div>
                 <h3>
                     <EditableSpan value={title} callBack={ChangeTodolist}/>
-                    <IconButton aria-label="delete" size="small" onClick={onClickTitleHandler}>
+                    <IconButton aria-label="delete" size="small" onClick={onClickTitleHandler} disabled={entityStatus === 'loading'}>
                         <Delete/>
                     </IconButton>
                 </h3>
-                <AddItemForm addItem={addNewTask}/>
+                <AddItemForm addItem={addNewTask} disabled={entityStatus === 'loading'}/>
                 {tasksForTodolist.map(t =>
                     <TaskComponent
                         key={t.id}
                         changeTaskStatus={changeTaskStatus}
                         removeTask={removeTask}
-                        ChangeTaskTitle={ChangeTaskTitle}
+                        changeTaskTitle={changeTaskTitle}
                         task={t}
                         todolistId={id}/>
                 )}

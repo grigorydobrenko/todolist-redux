@@ -2,7 +2,7 @@ import React, {useCallback, useEffect} from "react"
 import {useAppDispatch, useAppSelector} from "../../app/hooks"
 import {createTaskTC, deleteTaskTC, updateTaskTC} from "./tasks-reducer"
 import {
-    ChangeTodolistFilterAC,
+    changeTodolistFilterAC,
     changeTodoTitleTC,
     createTodoTC,
     deleteTodoTC,
@@ -24,7 +24,7 @@ export const TodolistsLists: React.FC = (props) => {
 
 
     const changeFilter = useCallback((todolistID: string, filter: FilterType) => {
-        dispatch(ChangeTodolistFilterAC(todolistID, filter))
+        dispatch(changeTodolistFilterAC(todolistID, filter))
     }, [dispatch])
 
     const addTask = useCallback((todolistID: string, newTitle: string) => {
@@ -44,12 +44,12 @@ export const TodolistsLists: React.FC = (props) => {
         dispatch(createTodoTC(todolistTitle))
     }, [dispatch])
 
-    const ChangeTaskTitle = useCallback((TodolistId: string, taskId: string, newTitle: string) => {
+    const changeTaskTitle = useCallback((TodolistId: string, taskId: string, newTitle: string) => {
         dispatch(updateTaskTC(TodolistId, taskId, {title: newTitle}))
     }, [dispatch])
 
 
-    const ChangeTodolistTitle = useCallback((TodolistId: string, newTitle: string) => {
+    const changeTodolistTitle = useCallback((TodolistId: string, newTitle: string) => {
         dispatch(changeTodoTitleTC(TodolistId, newTitle))
     }, [dispatch])
 
@@ -68,6 +68,7 @@ export const TodolistsLists: React.FC = (props) => {
                         <Todolist
                             key={t.id}
                             id={t.id}
+                            entityStatus={t.entityStatus}
                             title={t.title}
                             tasks={tasks[t.id]}
                             removeTask={removeTask}
@@ -76,8 +77,8 @@ export const TodolistsLists: React.FC = (props) => {
                             changeTaskStatus={changeTaskStatus}
                             filter={t.filter}
                             removeTodolist={removeTodolist}
-                            ChangeTaskTitle={ChangeTaskTitle}
-                            ChangeTodolistTitle={ChangeTodolistTitle}
+                            changeTaskTitle={changeTaskTitle}
+                            changeTodolistTitle={changeTodolistTitle}
                         />
                     </Paper>
                 </Grid>

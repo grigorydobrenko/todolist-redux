@@ -8,7 +8,7 @@ import {TaskStatuses, TaskType} from "../../../../api/todolist-api"
 type TaskPropsType = {
     changeTaskStatus: (todolistID: string, taskId: string, status: TaskStatuses) => void
     removeTask: (todolistId: string, taskID: string) => void
-    ChangeTaskTitle: (TodolistId: string, taskId: string, newTitle: string) => void
+    changeTaskTitle: (TodolistId: string, taskId: string, newTitle: string) => void
     task: TaskType
     todolistId: string
 
@@ -22,8 +22,8 @@ const TaskComponent = React.memo((props: TaskPropsType) => {
         props.changeTaskStatus(props.todolistId, props.task.id, status)
     }, [props.todolistId, props.task.id])
     const ChangeTask = useCallback((taskId: string, newTitle: string) => {
-        props.ChangeTaskTitle(props.todolistId, taskId, newTitle)
-    }, [props.ChangeTaskTitle, props.todolistId])
+        props.changeTaskTitle(props.todolistId, taskId, newTitle)
+    }, [props.changeTaskTitle, props.todolistId])
 
     return <div key={props.task.id} className={props.task.status === TaskStatuses.Completed ? 'is-done' : ''}>
         <Checkbox onChange={onChangeHandler} checked={props.task.status === TaskStatuses.Completed} color='primary'/>
