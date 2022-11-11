@@ -35,7 +35,8 @@ const initialGlobalState: AppRootStateType = {
                 deadline: '',
                 todoListId: 'todolistId1',
                 order: 0,
-                addedDate: ''
+                addedDate: '',
+                entityStatus: 'idle'
 
             },
             {
@@ -46,7 +47,8 @@ const initialGlobalState: AppRootStateType = {
                 deadline: '',
                 todoListId: 'todolistId1',
                 order: 0,
-                addedDate: ''
+                addedDate: '',
+                entityStatus: 'idle'
             }
         ],
         ['todolistId2']: [
@@ -58,7 +60,8 @@ const initialGlobalState: AppRootStateType = {
                 deadline: '',
                 todoListId: 'todolistId2',
                 order: 0,
-                addedDate: ''
+                addedDate: '',
+                entityStatus: 'idle'
             },
             {
                 id: v1(), title: 'React Book', status: TaskStatuses.New,
@@ -68,7 +71,8 @@ const initialGlobalState: AppRootStateType = {
                 deadline: '',
                 todoListId: 'todolistId2',
                 order: 0,
-                addedDate: ''
+                addedDate: '',
+                entityStatus: 'idle'
             }
         ]
     },

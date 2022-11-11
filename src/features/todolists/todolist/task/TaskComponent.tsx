@@ -11,6 +11,7 @@ type TaskPropsType = {
     changeTaskTitle: (TodolistId: string, taskId: string, newTitle: string) => void
     task: TaskType
     todolistId: string
+    disabled: boolean
 
 }
 const TaskComponent = React.memo((props: TaskPropsType) => {
@@ -26,9 +27,12 @@ const TaskComponent = React.memo((props: TaskPropsType) => {
     }, [props.changeTaskTitle, props.todolistId])
 
     return <div key={props.task.id} className={props.task.status === TaskStatuses.Completed ? 'is-done' : ''}>
-        <Checkbox onChange={onChangeHandler} checked={props.task.status === TaskStatuses.Completed} color='primary'/>
-        <EditableSpan value={props.task.title} callBack={(newTitle) => ChangeTask(props.task.id, newTitle)}/>
-        <IconButton aria-label="delete" size="small" onClick={() => RemoveTaskHandler(props.task.id)}>
+        <Checkbox onChange={onChangeHandler} checked={props.task.status === TaskStatuses.Completed} color='primary'
+                  disabled={props.disabled}/>
+        <EditableSpan value={props.task.title} callBack={(newTitle) => ChangeTask(props.task.id, newTitle)}
+                      disabled={props.disabled}/>
+        <IconButton aria-label="delete" size="small" onClick={() => RemoveTaskHandler(props.task.id)}
+                    disabled={props.disabled}>
             <Delete/>
         </IconButton>
     </div>

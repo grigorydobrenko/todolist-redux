@@ -4,16 +4,16 @@ import EditableSpan from "../../../components/editableSpan/EditableSpan"
 import {Button, IconButton} from "@mui/material"
 import {Delete} from "@mui/icons-material"
 import TaskComponent from "./task/TaskComponent"
-import {TaskStatuses, TaskType} from "../../../api/todolist-api"
+import {TaskStatuses} from "../../../api/todolist-api"
 import {FilterType} from "../todolists-reducer";
-import {fetchTasksTC} from "../tasks-reducer";
+import {fetchTasksTC, TaskDomainType} from "../tasks-reducer";
 import {useAppDispatch} from "../../../app/hooks";
 import {RequestStatusType} from "../../../app/app-reducer";
 
 type PropsType = {
     id: string
     title: string
-    tasks: TaskType[]
+    tasks: TaskDomainType[]
     removeTask: (todolistId: string, taskID: string) => void
     changeFilter: (todolistID: string, filter: FilterType) => void
     addTask: (todolistID: string, newTitle: string) => void
@@ -93,7 +93,7 @@ export const Todolist: React.FC<PropsType> = React.memo((
         <div className="App">
             <div>
                 <h3>
-                    <EditableSpan value={title} callBack={ChangeTodolist}/>
+                    <EditableSpan value={title} callBack={ChangeTodolist} disabled={entityStatus === 'loading'}/>
                     <IconButton aria-label="delete" size="small" onClick={onClickTitleHandler} disabled={entityStatus === 'loading'}>
                         <Delete/>
                     </IconButton>
@@ -106,7 +106,9 @@ export const Todolist: React.FC<PropsType> = React.memo((
                         removeTask={removeTask}
                         changeTaskTitle={changeTaskTitle}
                         task={t}
-                        todolistId={id}/>
+                        todolistId={id}
+                        disabled={t.entityStatus === 'loading' || entityStatus === 'loading'}
+                    />
                 )}
                 <div>
                     <Button onClick={onAllClickHandler} variant={allClassName} color='warning'>All</Button>

@@ -18,7 +18,7 @@ export const todolistsReducer = (state = initialState, action: TodolistActionsTy
             return state.map(t => t.id === action.id ? {...t, filter: action.filter} : t)
         case "SET-TODOS":
             return action.todos.map(t => ({...t, filter: "active", entityStatus: 'idle'}))
-        case "SET-ENTITY-STATUS":
+        case "SET-TODOLIST-ENTITY-STATUS":
             return state.map(t => t.id === action.id ? {...t, entityStatus: action.status} : t)
         default:
             return state
@@ -39,7 +39,7 @@ export const changeTodolistFilterAC = (id: string, filter: FilterType) => ({
 } as const)
 export const setTodolistsAC = (todos: TodolistType[]) => ({type: 'SET-TODOS', todos} as const)
 export const changeTodolistEntityStatusAC = (id: string, status: RequestStatusType) => ({
-    type: 'SET-ENTITY-STATUS',
+    type: 'SET-TODOLIST-ENTITY-STATUS',
     id,
     status
 } as const)
@@ -73,16 +73,23 @@ export const createTodoTC = (title: string): AppThunk => (dispatch) => {
         }
     }).catch((e: AxiosError) => {
         handleServerNetWorkError(dispatch, e)
-    }).finally(() => {
-        dispatch(setAppStatus('idle'))
     })
 }
 
 export const changeTodoTitleTC = (todoId: string, title: string): AppThunk => (dispatch) => {
     dispatch(setAppStatus('loading'))
+    dispatch(changeTodolistEntityStatusAC(todoId, 'loading'))
     todolistAPI.updateTodolist(todoId, title).then(res => {
-        dispatch(changeTodolistTitleAC(todoId, title))
-        dispatch(setAppStatus('succeeded'))
+        if (res.data.resultCode === ResultCode.OK) {
+            dispatch(changeTodolistTitleAC(todoId, title))
+            dispatch(setAppStatus('succeeded'))
+        } else {
+            handleServerAppError(dispatch, res.data)
+        }
+    }).catch((e: AxiosError) => {
+        handleServerNetWorkError(dispatch, e)
+    }).finally(() => {
+        dispatch(changeTodolistEntityStatusAC(todoId, 'idle'))
     })
 }
 
