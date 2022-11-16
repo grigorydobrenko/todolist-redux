@@ -1,4 +1,6 @@
-import axios from 'axios'
+import axios, {AxiosResponse} from 'axios'
+import {LoginPayloadType} from "../features/login/Login";
+import {UpdateTaskType} from "../features/todolists/tasks-reducer";
 
 
 const instance = axios.create({
@@ -12,13 +14,13 @@ const instance = axios.create({
 //api
 export const todolistAPI = {
     updateTodolist(todolistId: string, title: string) {
-        return instance.put<ResponseType>(`todo-lists/${todolistId}`, {title: title})
+        return instance.put<{ title: string }, AxiosResponse<ResponseType>>(`todo-lists/${todolistId}`, {title: title})
     },
     getTodolists() {
         return instance.get<TodolistType[]>(`todo-lists/`)
     },
     createTodolist(title: string) {
-        return instance.post<ResponseType<{ item: TodolistType }>>(`todo-lists/`, {title: title})
+        return instance.post<{ title: string }, AxiosResponse<ResponseType<{ item: TodolistType }>>>(`todo-lists/`, {title: title})
     },
     deleteTodolist(todolistId: string) {
         return instance.delete<ResponseType>(`todo-lists/${todolistId}`)
@@ -27,17 +29,24 @@ export const todolistAPI = {
         return instance.get<ResponseGetTasksType>(`todo-lists/${todolistId}/tasks`)
     },
     createTask(todolistId: string, title: string) {
-        return instance.post<ResponseType<{ item: TaskType }>>(`todo-lists/${todolistId}/tasks`, {title: title})
+        return instance.post<{ title: string }, AxiosResponse<ResponseType<{ item: TaskType }>>>(`todo-lists/${todolistId}/tasks`, {title: title})
     },
     updateTask(todolistId: string, taskId: string, model: ModelType) {
-        return instance.put<ResponseType<{ item: TaskType }>>(`todo-lists/${todolistId}/tasks/${taskId}`, model)
+        return instance.put<UpdateTaskType, AxiosResponse<ResponseType<{ item: TaskType }>>>(`todo-lists/${todolistId}/tasks/${taskId}`, model)
     },
     deleteTask(todolistId: string, taskId: string) {
         return instance.delete<ResponseType>(`todo-lists/${todolistId}/tasks/${taskId}`)
     }
 }
 
+export const authAPI = {
+    login(data: LoginPayloadType) {
+        return instance.post<LoginPayloadType, AxiosResponse<ResponseType<{ userId: number }>>>(`auth/login`, data)
+    }
+}
+
 //types
+
 
 export type TaskType = {
     description: string
@@ -76,12 +85,14 @@ export type ResponseType<D = {}> = {
     fieldsErrors: string
     data: D
 }
+
 export enum TaskStatuses {
     New = 0,
     InProgress = 1,
     Completed = 2,
     Draft = 3
 }
+
 export enum TaskPriorities {
     Low = 0,
     Middle = 1,
@@ -89,6 +100,7 @@ export enum TaskPriorities {
     Urgently = 3,
     Later = 4
 }
+
 export enum ResultCode {
     OK = 0,
     ERROR = 1,

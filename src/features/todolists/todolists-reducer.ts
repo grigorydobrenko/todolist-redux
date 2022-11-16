@@ -1,6 +1,6 @@
 import {ResultCode, todolistAPI, TodolistType} from "../../api/todolist-api"
 import {AppThunk} from "../../app/store"
-import {RequestStatusType, SetAppErrorType, setAppStatus, SetAppStatusType} from "../../app/app-reducer";
+import {RequestStatusType, setAppErrorACType, setAppStatusAC, setAppStatusACType} from "../../app/app-reducer";
 import axios, {AxiosError} from "axios";
 import {handleServerAppError, handleServerNetWorkError} from "../../utils/error-utils";
 
@@ -46,10 +46,10 @@ export const changeTodolistEntityStatusAC = (id: string, status: RequestStatusTy
 
 export const getTodoTC = (): AppThunk => async (dispatch) => {
     try {
-        dispatch(setAppStatus('loading'))
+        dispatch(setAppStatusAC('loading'))
         const res = await todolistAPI.getTodolists()
         dispatch(setTodolistsAC(res.data))
-        dispatch(setAppStatus('succeeded'))
+        dispatch(setAppStatusAC('succeeded'))
     } catch (e) {
         const err = e as Error | AxiosError
         if (axios.isAxiosError(err)) {
@@ -60,11 +60,11 @@ export const getTodoTC = (): AppThunk => async (dispatch) => {
 
 export const deleteTodoTC = (todoId: string): AppThunk => async (dispatch) => {
     try {
-        dispatch(setAppStatus('loading'))
+        dispatch(setAppStatusAC('loading'))
         dispatch(changeTodolistEntityStatusAC(todoId, 'loading'))
         await todolistAPI.deleteTodolist(todoId)
         dispatch(removeTodolistAC(todoId))
-        dispatch(setAppStatus('succeeded'))
+        dispatch(setAppStatusAC('succeeded'))
     } catch (e) {
         dispatch(changeTodolistEntityStatusAC(todoId, 'idle'))
         const err = e as Error | AxiosError
@@ -77,7 +77,7 @@ export const deleteTodoTC = (todoId: string): AppThunk => async (dispatch) => {
 
 export const createTodoTC = (title: string): AppThunk => async (dispatch) => {
     try {
-        dispatch(setAppStatus('loading'))
+        dispatch(setAppStatusAC('loading'))
         const res = await todolistAPI.createTodolist(title)
         if (res.data.resultCode === ResultCode.OK) {
             dispatch(addTodolistAC(res.data.data.item))
@@ -95,12 +95,12 @@ export const createTodoTC = (title: string): AppThunk => async (dispatch) => {
 
 export const changeTodoTitleTC = (todoId: string, title: string): AppThunk => async (dispatch) => {
     try {
-        dispatch(setAppStatus('loading'))
+        dispatch(setAppStatusAC('loading'))
         dispatch(changeTodolistEntityStatusAC(todoId, 'loading'))
         const res = await todolistAPI.updateTodolist(todoId, title)
         if (res.data.resultCode === ResultCode.OK) {
             dispatch(changeTodolistTitleAC(todoId, title))
-            dispatch(setAppStatus('succeeded'))
+            dispatch(setAppStatusAC('succeeded'))
         } else {
             handleServerAppError(dispatch, res.data)
         }
@@ -129,8 +129,8 @@ export type TodolistActionsType =
     | ChangeTodolistTitleACType
     | ChangeTodolistFilterAC
     | SetTodoListsType
-    | SetAppStatusType
-    | SetAppErrorType
+    | setAppStatusACType
+    | setAppErrorACType
     | ChangeTodolistEntityStatusType
 
 

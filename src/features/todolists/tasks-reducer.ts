@@ -1,7 +1,7 @@
 import {AddTodoListACType, RemoveTodolistAC, SetTodoListsType} from "./todolists-reducer"
 import {ModelType, ResultCode, TaskType, todolistAPI} from "../../api/todolist-api"
 import {AppRootStateType, AppThunk} from "../../app/store"
-import {RequestStatusType, setAppStatus, SetAppStatusType} from "../../app/app-reducer";
+import {RequestStatusType, setAppStatusAC, setAppStatusACType} from "../../app/app-reducer";
 import axios, {AxiosError} from "axios";
 import {handleServerAppError, handleServerNetWorkError} from "../../utils/error-utils";
 
@@ -67,10 +67,10 @@ export const changeTaskEntityStatusAC = (todolistId: string, TaskId: string, sta
 
 export const fetchTasksTC = (todoId: string): AppThunk => async (dispatch) => {
     try {
-        dispatch(setAppStatus('loading'))
+        dispatch(setAppStatusAC('loading'))
         const res = await todolistAPI.getTasks(todoId)
         dispatch(setTasksAC(res.data.items, todoId))
-        dispatch(setAppStatus('succeeded'))
+        dispatch(setAppStatusAC('succeeded'))
     } catch (e) {
         const err = e as Error | AxiosError
         if (axios.isAxiosError(err)) {
@@ -81,12 +81,12 @@ export const fetchTasksTC = (todoId: string): AppThunk => async (dispatch) => {
 
 export const deleteTaskTC = (todoId: string, taskId: string): AppThunk => async (dispatch) => {
     try {
-        dispatch(setAppStatus('loading'))
+        dispatch(setAppStatusAC('loading'))
         dispatch(changeTaskEntityStatusAC(todoId, taskId, 'loading'))
         const res = await todolistAPI.deleteTask(todoId, taskId)
         if (res.data.resultCode === ResultCode.OK) {
             dispatch(removeTaskAC(taskId, todoId))
-            dispatch(setAppStatus('succeeded'))
+            dispatch(setAppStatusAC('succeeded'))
         } else {
             handleServerAppError(dispatch, res.data)
         }
@@ -100,11 +100,11 @@ export const deleteTaskTC = (todoId: string, taskId: string): AppThunk => async 
 
 export const createTaskTC = (todoId: string, title: string): AppThunk => async (dispatch) => {
     try {
-        dispatch(setAppStatus('loading'))
+        dispatch(setAppStatusAC('loading'))
         const res = await todolistAPI.createTask(todoId, title)
         if (res.data.resultCode === ResultCode.OK) {
             dispatch(addTaskAC(todoId, res.data.data.item))
-            dispatch(setAppStatus('succeeded'))
+            dispatch(setAppStatusAC('succeeded'))
         } else {
             handleServerAppError(dispatch, res.data)
         }
@@ -124,13 +124,13 @@ export const updateTaskTC = (todoId: string, taskId: string, value: UpdateTaskTy
             ...value
         }
         try {
-            dispatch(setAppStatus('loading'))
+            dispatch(setAppStatusAC('loading'))
             dispatch(changeTaskEntityStatusAC(todoId, taskId, 'loading'))
             const res = await todolistAPI.updateTask(todoId, taskId, model)
             if (res.data.resultCode === ResultCode.OK) {
                 const updatedTask = res.data.data.item
                 dispatch(updateTaskAC(taskId, updatedTask, todoId))
-                dispatch(setAppStatus('succeeded'))
+                dispatch(setAppStatusAC('succeeded'))
             } else {
                 handleServerAppError(dispatch, res.data)
             }
@@ -155,7 +155,7 @@ export type TaskActionsType =
     | RemoveTodolistAC
     | SetTodoListsType
     | setTasksACType
-    | SetAppStatusType
+    | setAppStatusACType
     | changeTaskEntityStatusACType
 
 type removeTaskACType = ReturnType<typeof removeTaskAC>
@@ -164,7 +164,7 @@ type changeTaskStatusACType = ReturnType<typeof updateTaskAC>
 type setTasksACType = ReturnType<typeof setTasksAC>
 type changeTaskEntityStatusACType = ReturnType<typeof changeTaskEntityStatusAC>
 
-type UpdateTaskType = {
+export type UpdateTaskType = {
     title?: string
     description?: string
     status?: number
