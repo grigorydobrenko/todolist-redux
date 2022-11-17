@@ -66,8 +66,8 @@ export const changeTaskEntityStatusAC = (todolistId: string, TaskId: string, sta
 } as const)
 
 export const fetchTasksTC = (todoId: string): AppThunk => async (dispatch) => {
+    dispatch(setAppStatusAC('loading'))
     try {
-        dispatch(setAppStatusAC('loading'))
         const res = await todolistAPI.getTasks(todoId)
         dispatch(setTasksAC(res.data.items, todoId))
         dispatch(setAppStatusAC('succeeded'))
@@ -80,9 +80,9 @@ export const fetchTasksTC = (todoId: string): AppThunk => async (dispatch) => {
 }
 
 export const deleteTaskTC = (todoId: string, taskId: string): AppThunk => async (dispatch) => {
+    dispatch(setAppStatusAC('loading'))
+    dispatch(changeTaskEntityStatusAC(todoId, taskId, 'loading'))
     try {
-        dispatch(setAppStatusAC('loading'))
-        dispatch(changeTaskEntityStatusAC(todoId, taskId, 'loading'))
         const res = await todolistAPI.deleteTask(todoId, taskId)
         if (res.data.resultCode === ResultCode.OK) {
             dispatch(removeTaskAC(taskId, todoId))
@@ -99,8 +99,8 @@ export const deleteTaskTC = (todoId: string, taskId: string): AppThunk => async 
 }
 
 export const createTaskTC = (todoId: string, title: string): AppThunk => async (dispatch) => {
+    dispatch(setAppStatusAC('loading'))
     try {
-        dispatch(setAppStatusAC('loading'))
         const res = await todolistAPI.createTask(todoId, title)
         if (res.data.resultCode === ResultCode.OK) {
             dispatch(addTaskAC(todoId, res.data.data.item))

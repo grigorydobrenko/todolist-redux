@@ -22,15 +22,36 @@ export const authReducer = (state: InitialStateType = initialState, action: Acti
 export const setIsLoggedInAC = (value: boolean) =>
     ({type: 'login/SET-IS-LOGGED-IN', value} as const)
 
+
 // thunks
 export const loginTC = (data: LoginPayloadType): AppThunk => async (dispatch) => {
     dispatch(setAppStatusAC('loading'))
     try {
         const res = await authAPI.login(data)
         if (res.data.resultCode === ResultCode.OK) {
-           dispatch(setIsLoggedInAC(true))
+            dispatch(setIsLoggedInAC(true))
+            dispatch(setAppStatusAC('succeeded'))
         } else {
             handleServerAppError(dispatch, res.data)
+        }
+    } catch (e) {
+        const err = e as Error | AxiosError
+        if (axios.isAxiosError(err)) {
+            handleServerNetWorkError(dispatch, err)
+
+        }
+    }
+}
+
+export const logoutTC = (): AppThunk => async (dispatch) => {
+    dispatch(setAppStatusAC('loading'))
+    try {
+        const res = await authAPI.logout()
+        if (res.data.resultCode === 0) {
+            dispatch(setIsLoggedInAC(false))
+            dispatch(setAppStatusAC('succeeded'))
+        } else {
+            handleServerAppError(dispatch, res.data )
         }
     } catch (e) {
         const err = e as Error | AxiosError
@@ -39,6 +60,9 @@ export const loginTC = (data: LoginPayloadType): AppThunk => async (dispatch) =>
         }
     }
 }
+
+
+
 
 // types
 

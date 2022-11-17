@@ -88,7 +88,6 @@ export const Todolist: React.FC<PropsType> = React.memo((
         dispatch(fetchTasksTC(id))
     }, [])
 
-
     return (
         <div className="App">
             <div>
@@ -99,7 +98,9 @@ export const Todolist: React.FC<PropsType> = React.memo((
                     </IconButton>
                 </h3>
                 <AddItemForm addItem={addNewTask} disabled={entityStatus === 'loading'}/>
-                {tasksForTodolist.map(t =>
+
+                {!tasksForTodolist.length && <span>No tasks</span>}
+                { tasksForTodolist.map(t =>
                     <TaskComponent
                         key={t.id}
                         changeTaskStatus={changeTaskStatus}

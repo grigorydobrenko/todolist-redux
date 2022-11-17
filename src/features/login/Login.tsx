@@ -8,7 +8,10 @@ import FormLabel from '@mui/material/FormLabel';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import {useFormik} from "formik";
-import {useAppDispatch} from "../../app/hooks";
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {loginTC} from "./auth-reducer";
+import {Navigate} from "react-router-dom";
+import {ROUTS} from "../../app/App";
 
 type FormikErrorType = {
     email?: string
@@ -25,6 +28,7 @@ export type LoginPayloadType = {
 
 export const Login = () => {
     const dispatch = useAppDispatch()
+    const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
 
     const formik = useFormik({
         initialValues: {
@@ -34,7 +38,6 @@ export const Login = () => {
             captcha: ''
         },
         validate: (values: LoginPayloadType) => {
-            console.log('validate render')
             const errors: FormikErrorType = {}
             if (!values.email) {
                 errors.email = 'Required'
@@ -43,18 +46,22 @@ export const Login = () => {
             }
             if (!values.password) {
                 errors.password = 'Required'
-            } else if (values.password.length < 7) {
+            } else if (values.password.length < 3) {
                 errors.password = 'Too short password'
             }
             return errors
         },
         onSubmit: (values: LoginPayloadType) => {
-            alert(JSON.stringify(values, null, 2));
+            dispatch(loginTC(values))
             formik.resetForm()
         },
     });
+    
 
-    console.log(formik.errors)
+    if (isLoggedIn) {
+        return <Navigate to={ROUTS.DEFAULT}/>
+    }
+
     return <Grid container justifyContent={'center'}>
         <Grid item justifyContent={'center'}>
             <form onSubmit={formik.handleSubmit}>

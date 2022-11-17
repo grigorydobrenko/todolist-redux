@@ -45,22 +45,24 @@ export const changeTodolistEntityStatusAC = (id: string, status: RequestStatusTy
 } as const)
 
 export const getTodoTC = (): AppThunk => async (dispatch) => {
+    dispatch(setAppStatusAC('loading'))
     try {
-        dispatch(setAppStatusAC('loading'))
         const res = await todolistAPI.getTodolists()
         dispatch(setTodolistsAC(res.data))
         dispatch(setAppStatusAC('succeeded'))
     } catch (e) {
+
         const err = e as Error | AxiosError
         if (axios.isAxiosError(err)) {
             handleServerNetWorkError(dispatch, err)
+            dispatch(setAppStatusAC('failed'))
         }
     }
 }
 
 export const deleteTodoTC = (todoId: string): AppThunk => async (dispatch) => {
+    dispatch(setAppStatusAC('loading'))
     try {
-        dispatch(setAppStatusAC('loading'))
         dispatch(changeTodolistEntityStatusAC(todoId, 'loading'))
         await todolistAPI.deleteTodolist(todoId)
         dispatch(removeTodolistAC(todoId))
@@ -76,8 +78,8 @@ export const deleteTodoTC = (todoId: string): AppThunk => async (dispatch) => {
 }
 
 export const createTodoTC = (title: string): AppThunk => async (dispatch) => {
+    dispatch(setAppStatusAC('loading'))
     try {
-        dispatch(setAppStatusAC('loading'))
         const res = await todolistAPI.createTodolist(title)
         if (res.data.resultCode === ResultCode.OK) {
             dispatch(addTodolistAC(res.data.data.item))
@@ -94,9 +96,9 @@ export const createTodoTC = (title: string): AppThunk => async (dispatch) => {
 }
 
 export const changeTodoTitleTC = (todoId: string, title: string): AppThunk => async (dispatch) => {
+    dispatch(setAppStatusAC('loading'))
+    dispatch(changeTodolistEntityStatusAC(todoId, 'loading'))
     try {
-        dispatch(setAppStatusAC('loading'))
-        dispatch(changeTodolistEntityStatusAC(todoId, 'loading'))
         const res = await todolistAPI.updateTodolist(todoId, title)
         if (res.data.resultCode === ResultCode.OK) {
             dispatch(changeTodolistTitleAC(todoId, title))
